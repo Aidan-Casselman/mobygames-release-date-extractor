@@ -1,6 +1,5 @@
 import requests
 import time
-import json
 import re
 
 with open("titles.txt") as x:
