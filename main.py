@@ -1,6 +1,5 @@
 import requests
 import time
-import json
 import re
 
 with open("titles.txt") as x:
@@ -93,3 +92,7 @@ def create_date_list():
     write_date_list()
 
 #create_date_list()
+
+## good human to computer interaction
+
+## robust exception handling
