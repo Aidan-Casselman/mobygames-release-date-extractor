@@ -9,12 +9,13 @@ with open("id_list.txt") as y:
 
 id_list = []
 date_list = []
+api_key = "moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5"
 
 ##########
 
 def get_id(title):
     url = "https://api.mobygames.com/v1/games"
-    params = {"api_key":"moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5","title":title,"format":"id","limit":"1"}
+    params = {"api_key":api_key,"title":title,"format":"id","limit":"1"}
 
     response = requests.get(url, params)
 
@@ -26,7 +27,7 @@ def get_id(title):
 
 def get_date(id):
     url = "https://api.mobygames.com/v1/games/" + str(id) + "/platforms"
-    params = {"api_key":"moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5"}
+    params = {"api_key":api_key}
 
     response = requests.get(url, params)
 
