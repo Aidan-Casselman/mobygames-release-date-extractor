@@ -1,11 +1,12 @@
 import requests
 import time
 import re
+import json
 
-with open("titles.txt") as x:
-    titles = x.read().splitlines()
-with open("id_list.txt") as y:
-    ids = y.read().splitlines()
+#with open("titles.txt") as x:
+    #titles = x.read().splitlines()
+#with open("id_list.txt") as y:
+    #ids = y.read().splitlines()
 
 id_list = []
 date_list = []
@@ -15,7 +16,7 @@ api_key = "moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5"
 
 def get_id(title):
     url = "https://api.mobygames.com/v1/games"
-    params = {"api_key":api_key,"title":title,"format":"id","limit":"1"}
+    params = {"api_key":api_key,"title":title,"format":"id"}
 
     response = requests.get(url, params)
 
@@ -23,9 +24,10 @@ def get_id(title):
         data = response.json()
         return(data)
     else:
-        print(response.status_code)
+        print("Error Code:" + response.status_code)
 
 def get_date(id):
+    
     url = "https://api.mobygames.com/v1/games/" + str(id) + "/platforms"
     params = {"api_key":api_key}
 
@@ -40,18 +42,15 @@ def get_date(id):
 ##########
 
 def extract_id(data):
-    for key, value in data.items():
-        value = str(value)
-        value = value[1:]
-        value = value[:-1]
-        value = int(value)
-        return(value)
+    id_list = []
+    for value in data.values():
+        return value
+print(extract_id(get_id("Madden NFL 2004")))
 
 def extract_date(data):
     data = str(data)
     date = re.findall(r'\d+', data)
     return date
-print(extract_date(get_date(623)))
 ##########
 
 def make_id_list(value):
