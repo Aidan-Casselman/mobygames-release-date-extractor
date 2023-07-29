@@ -2,6 +2,7 @@ import requests
 import time
 import re
 import json
+import os
 
 
 
@@ -9,6 +10,19 @@ id_list = []
 date_list = []
 api_key = "moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5"
 
+if os.path.isfile("api_calls.txt") == True:
+    if os.path.getsize("api_calls.txt") != 0:
+        file = open("api_calls.txt","r")
+        api_calls = file.readline()
+        api_calls = int(api_calls)
+    else:
+        file = open("api_calls.txt","w")
+        file.write("0")
+        file.close()
+        file = open("api_calls","r")
+        api_calls = file.readline()
+print(api_calls)
+print(type(api_calls))
 ##########
 
 def get_id(title):
@@ -17,6 +31,8 @@ def get_id(title):
 
     response = requests.get(url, params)
     time.sleep(1)
+    global api_calls
+    api_calls += 1
 
     if response.status_code == 200:
         data = response.json()
@@ -29,6 +45,8 @@ def get_date(id):
     params = {"api_key":api_key}
     response = requests.get(url, params)
     time.sleep(1)
+    global api_calls
+    api_calls += 1
     if response.status_code == 200:
         return response.json()
     else:
@@ -86,7 +104,6 @@ def create_date_list(ids, name):
         print("Game " + str(game_current) + "/" + str(game_count))
         for id in list:
             date = extract_date(get_date(id))
-            print("Number of IDs Checked: " + str(num_ids_checked))
             for d in date:
                 d = int(d)
                 if d >= 1980:
@@ -122,17 +139,21 @@ def menu():
         elif choice == "3":
             game_title = input("Enter the title of the game (not case sensitive): ")
             id_list = extract_id(get_id(game_title))
+            total_time = len(id_list)
             date_list = []
-            print("IDs: " + str(id_list))
-            for id in id_list:
-                date = extract_date(get_date(id))
-                for d in date:
-                    d = int(d)
-                    if d >= 1980:
-                        date_list.append(d)
-            final_date = min(date_list)
-            print(game_title + " was first released in " + str(final_date))
-            menu = False
+            if len(id_list) > 0:
+                for id in id_list:
+                    date = extract_date(get_date(id))
+                    os.system("cls")
+                    total_time -= 1
+                    print("Time Remaining: " + str(total_time))
+                    for d in date:
+                        d = int(d)
+                        if d >= 1980:
+                            date_list.append(d)
+                final_date = min(date_list)
+                os.system("cls")
+                print(game_title + " was first released in " + str(final_date))
         elif choice == "4":
             menu = False
         else:
@@ -142,6 +163,14 @@ def menu():
         
 menu()
 
+file = open("api_calls.txt","w")
+file.write(str(api_calls))
+file.close()
+
 ## good human to computer interaction
+
+## countdown
+
+## 360 api call limit
 
 ## robust exception handling
