@@ -21,8 +21,7 @@ if os.path.isfile("api_calls.txt") == True:
         file.close()
         file = open("api_calls","r")
         api_calls = file.readline()
-print(api_calls)
-print(type(api_calls))
+
 ##########
 
 def get_id(title):
@@ -51,6 +50,7 @@ def get_date(id):
         return response.json()
     else:
         print("Error Code: " + str(response.status_code))
+
 ##########
 
 def extract_id(data):
@@ -61,6 +61,7 @@ def extract_date(data):
     data = str(data)
     date = re.findall(r'\d{4}', data)
     return date
+
 ##########
 
 def make_id_list(value):
@@ -147,7 +148,6 @@ def menu():
                     os.system("cls")
                     total_time -= 1
                     print("Time Remaining: " + str(total_time))
-                    print("Total API Calls: " + str(api_calls))
                     for d in date:
                         d = int(d)
                         if d >= 1980:
@@ -155,12 +155,13 @@ def menu():
                 final_date = min(date_list)
                 os.system("cls")
                 print(game_title + " was first released in " + str(final_date))
+                print()
+                print("Total API Calls Made: " + str(api_calls))
+                print()
         elif choice == "4":
             menu = False
         else:
-            print("Invalid Input!")
-            
-                    
+            print("Invalid Input!")         
         
 menu()
 
