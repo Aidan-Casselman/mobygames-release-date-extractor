@@ -147,6 +147,7 @@ def menu():
                     os.system("cls")
                     total_time -= 1
                     print("Time Remaining: " + str(total_time))
+                    print("Total API Calls: " + str(api_calls))
                     for d in date:
                         d = int(d)
                         if d >= 1980:
