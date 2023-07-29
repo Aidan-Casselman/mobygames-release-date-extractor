@@ -3,6 +3,8 @@ import time
 import re
 import json
 import os
+from datetime import datetime, timedelta
+
 
 
 
@@ -21,6 +23,16 @@ if os.path.isfile("api_calls.txt") == True:
         file.close()
         file = open("api_calls","r")
         api_calls = file.readline()
+
+if os.path.isfile("close_time.txt") == True:
+    file = open("close_time.txt","r")
+    close_time = file.readline()
+    close_time = datetime.strptime(close_time, '%Y-%m-%d %H:%M:%S.%f')
+    launch_time = datetime.now()
+    difference = launch_time - close_time
+    threshold = timedelta(hours = 1)
+    if difference >= threshold:
+        api_calls = 0
 
 ##########
 
@@ -167,6 +179,11 @@ menu()
 
 file = open("api_calls.txt","w")
 file.write(str(api_calls))
+file.close()
+
+close_time = datetime.now()
+file = open("close_time.txt","w")
+file.write(str(close_time))
 file.close()
 
 ## good human to computer interaction
