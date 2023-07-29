@@ -3,10 +3,7 @@ import time
 import re
 import json
 
-#with open("titles.txt") as x:
-    #titles = x.read().splitlines()
-#with open("id_list.txt") as y:
-    #ids = y.read().splitlines()
+
 
 id_list = []
 date_list = []
@@ -19,37 +16,32 @@ def get_id(title):
     params = {"api_key":api_key,"title":title,"format":"id"}
 
     response = requests.get(url, params)
+    time.sleep(1)
 
     if response.status_code == 200:
         data = response.json()
         return(data)
     else:
-        print("Error Code:" + response.status_code)
+        print("Error Code: " + str(response.status_code))
 
 def get_date(id):
-    
     url = "https://api.mobygames.com/v1/games/" + str(id) + "/platforms"
     params = {"api_key":api_key}
-
     response = requests.get(url, params)
-
+    time.sleep(1)
     if response.status_code == 200:
-        data = response.json()
-        return(data)
+        return response.json()
     else:
-        print(response.status_code)
-
+        print("Error Code: " + str(response.status_code))
 ##########
 
 def extract_id(data):
-    id_list = []
     for value in data.values():
         return value
-print(extract_id(get_id("Madden NFL 2004")))
 
 def extract_date(data):
     data = str(data)
-    date = re.findall(r'\d+', data)
+    date = re.findall(r'\d{4}', data)
     return date
 ##########
 
@@ -63,35 +55,92 @@ def make_date_list(value):
 
 ##########
 
-def write_id_list():
-    file = open("id_list.txt","w")
+def write_id_list(name):
+    file = open(name,"w")
     for i in id_list:
         file.write(str(i)+"\n")
     file.close()
 
-def write_date_list():
-    file = open("date_list.txt","w")
+def write_date_list(name):
+    file = open(name,"w")
     for d in date_list:
         file.write(str(d)+"\n")
     file.close()
 
 ##########
 
-def create_id_list():
+def create_id_list(titles, name):
     for t in titles:
         make_id_list(extract_id(get_id(t)))
         time.sleep(1)
     
-    write_id_list()
+    write_id_list(name)
 
-def create_date_list():
-    for i in ids:
-        make_date_list(extract_date(get_date(i)))
-        time.sleep(1)
+def create_date_list(ids, name):
+    game_current = 0
+    game_count = len(ids)
+    for line in ids:
+        game_current += 1
+        list = line.strip('][').split(', ')
+        date_list = []
+        print("Game " + str(game_current) + "/" + str(game_count))
+        for id in list:
+            date = extract_date(get_date(id))
+            print("Number of IDs Checked: " + str(num_ids_checked))
+            for d in date:
+                d = int(d)
+                if d >= 1980:
+                    date_list.append(d)
+        final_date = min(date_list)
+        make_date_list(final_date)
     
-    write_date_list()
+    write_date_list(name)
 
-#create_date_list()
+def menu():
+    menu = True
+    while menu == True:
+        print("Would you like to:")
+        print("1. Load List of Game Titles and Create ID List")
+        print("2. Load ID List and Create Date List")
+        print("3. Enter Game Title Manually and Get First Release Date")
+        print("4. Exit Program")
+        choice = input()
+        if choice == "1":
+            name = input("Enter the name of the titles text file: ")
+            id_name = input("Name the output file (remember to include .txt): ")
+            with open(name) as x:
+                titles = x.read().splitlines()
+            create_id_list(titles, id_name)
+            menu = False
+        elif choice == "2":
+            name = input("Enter the name of the ID List text file: ")
+            date_name = input("Name the output file (remember to include .txt): ")
+            with open(name) as y:
+                ids = y.read().splitlines()
+            create_date_list(ids, date_name)
+            menu = False
+        elif choice == "3":
+            game_title = input("Enter the title of the game (not case sensitive): ")
+            id_list = extract_id(get_id(game_title))
+            date_list = []
+            print("IDs: " + str(id_list))
+            for id in id_list:
+                date = extract_date(get_date(id))
+                for d in date:
+                    d = int(d)
+                    if d >= 1980:
+                        date_list.append(d)
+            final_date = min(date_list)
+            print(game_title + " was first released in " + str(final_date))
+            menu = False
+        elif choice == "4":
+            menu = False
+        else:
+            print("Invalid Input!")
+            
+                    
+        
+menu()
 
 ## good human to computer interaction
 
