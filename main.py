@@ -6,7 +6,8 @@ import os
 from datetime import datetime, timedelta
 
 
-
+#make launch time only not close time
+#make countdown delete lines and menu actions too
 
 id_list = []
 date_list = []
@@ -38,6 +39,9 @@ if os.path.isfile("close_time.txt") == True:
 
 def get_id(title):
     url = "https://api.mobygames.com/v1/games"
+    words = title.split()
+    if words[0] == "the":
+        title = title[4:]
     params = {"api_key":api_key,"title":title,"format":"id"}
 
     response = requests.get(url, params)
@@ -103,8 +107,6 @@ def write_date_list(name):
 def create_id_list(titles, name):
     for t in titles:
         make_id_list(extract_id(get_id(t)))
-        time.sleep(1)
-    
     write_id_list(name)
 
 def create_date_list(ids, name):
@@ -151,25 +153,32 @@ def menu():
             menu = False
         elif choice == "3":
             game_title = input("Enter the title of the game (not case sensitive): ")
+            print("Searching...")
             id_list = extract_id(get_id(game_title))
+            print(id_list)
             total_time = len(id_list)
-            date_list = []
-            if len(id_list) > 0:
-                for id in id_list:
-                    date = extract_date(get_date(id))
-                    os.system("cls")
-                    total_time -= 1
-                    print("Time Remaining: " + str(total_time))
-                    for d in date:
-                        d = int(d)
-                        if d >= 1980:
-                            date_list.append(d)
-                final_date = min(date_list)
+            if total_time < 1:
+                print("Game not found!")
+            else:
                 os.system("cls")
-                print(game_title + " was first released in " + str(final_date))
-                print()
-                print("Total API Calls Made: " + str(api_calls))
-                print()
+                print("Game IDs Remaining: " + str(total_time))
+                date_list = []
+                if len(id_list) > 0:
+                    for id in id_list:
+                        date = extract_date(get_date(id))
+                        os.system("cls")
+                        total_time -= 1
+                        print("Game IDs Remaining: " + str(total_time))
+                        for d in date:
+                            d = int(d)
+                            if d >= 1980:
+                                date_list.append(d)
+                    final_date = min(date_list)
+                    os.system("cls")
+                    print(game_title + " was first released in " + str(final_date))
+                    print()
+                    print("Total API Calls Made Within Hour: " + str(api_calls))
+                    print()
         elif choice == "4":
             menu = False
         else:
