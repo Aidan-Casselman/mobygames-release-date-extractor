@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timedelta
 
 
-#make launch time only not close time
+#make launch time only not close time, only create datetime when needed
 #make countdown delete lines and menu actions too
 
 id_list = []
@@ -82,11 +82,11 @@ def extract_date(data):
 
 def make_id_list(value):
     id_list.append(value)
-    print(id_list)
+    print(value)
 
 def make_date_list(value):
     date_list.append(value)
-    print(date_list)
+    print(value)
 
 ##########
 
@@ -128,6 +128,12 @@ def create_date_list(ids, name):
     
     write_date_list(name)
 
+def remove_menu():
+    delete = 6
+    while delete > 0:
+        print ("\033[A                                                                           \033[A")
+        delete -= 1
+
 def menu():
     menu = True
     while menu == True:
@@ -138,35 +144,35 @@ def menu():
         print("4. Exit Program")
         choice = input()
         if choice == "1":
+            remove_menu()
             name = input("Enter the name of the titles text file: ")
             id_name = input("Name the output file (remember to include .txt): ")
             with open(name) as x:
                 titles = x.read().splitlines()
             create_id_list(titles, id_name)
-            menu = False
         elif choice == "2":
+            remove_menu()
             name = input("Enter the name of the ID List text file: ")
             date_name = input("Name the output file (remember to include .txt): ")
             with open(name) as y:
                 ids = y.read().splitlines()
             create_date_list(ids, date_name)
-            menu = False
         elif choice == "3":
+            remove_menu()
             game_title = input("Enter the title of the game (not case sensitive): ")
             print("Searching...")
             id_list = extract_id(get_id(game_title))
-            print(id_list)
             total_time = len(id_list)
             if total_time < 1:
                 print("Game not found!")
             else:
-                os.system("cls")
+                print ("\033[A                             \033[A")
                 print("Game IDs Remaining: " + str(total_time))
                 date_list = []
                 if len(id_list) > 0:
                     for id in id_list:
                         date = extract_date(get_date(id))
-                        os.system("cls")
+                        print ("\033[A                             \033[A")
                         total_time -= 1
                         print("Game IDs Remaining: " + str(total_time))
                         for d in date:
@@ -174,7 +180,8 @@ def menu():
                             if d >= 1980:
                                 date_list.append(d)
                     final_date = min(date_list)
-                    os.system("cls")
+                    print ("\033[A                             \033[A")
+                    print()
                     print(game_title + " was first released in " + str(final_date))
                     print()
                     print("Total API Calls Made Within Hour: " + str(api_calls))
@@ -196,8 +203,6 @@ file.write(str(close_time))
 file.close()
 
 ## good human to computer interaction
-
-## countdown
 
 ## 360 api call limit
 
