@@ -1,13 +1,12 @@
 import requests
 import time
 import re
-import json
 import os
 from datetime import datetime, timedelta
 
-
 #make launch time only not close time, only create datetime when needed
 #make countdown delete lines and menu actions too
+#add settings (first or last release, limit) + first time launch sequence (user must give valid api_key) + change save file system (1 file for all save information)
 
 id_list = []
 date_list = []
@@ -175,26 +174,31 @@ def menu():
             if total_time < 1:
                 print("Game not found!")
             else:
-                print ("\033[A                             \033[A")
-                print("Game IDs Remaining: " + str(total_time))
-                date_list = []
-                if len(id_list) > 0:
-                    for id in id_list:
-                        date = extract_date(get_date(id))
+                if total_time == 100:
+                    choice = input("There are " + str(total_time) + " (limit 100) Game IDs matching " + str(game_title) + ". Would you like to continue? (y/n): ")
+                else:
+                    choice = input("There are " + str(total_time) + " Game IDs matching " + str(game_title) + ". Would you like to continue? (y/n): ")
+                if choice == "y":
+                    print ("\033[A                                                                                                                        \033[A")
+                    print("Game IDs Remaining: " + str(total_time))
+                    date_list = []
+                    if len(id_list) > 0:
+                        for id in id_list:
+                            date = extract_date(get_date(id))
+                            print ("\033[A                                                                                                                        \033[A")
+                            total_time -= 1
+                            print("Game IDs Remaining: " + str(total_time))
+                            for d in date:
+                                d = int(d)
+                                if d >= 1980:
+                                    date_list.append(d)
+                        final_date = min(date_list)
                         print ("\033[A                             \033[A")
-                        total_time -= 1
-                        print("Game IDs Remaining: " + str(total_time))
-                        for d in date:
-                            d = int(d)
-                            if d >= 1980:
-                                date_list.append(d)
-                    final_date = min(date_list)
-                    print ("\033[A                             \033[A")
-                    print()
-                    print(game_title + " was first released in " + str(final_date))
-                    print()
-                    print("Total API Calls Made Within Hour: " + str(api_calls))
-                    print()
+                        print()
+                        print(game_title + " was first released in " + str(final_date))
+                        print()
+                        print("API Calls Made Within Hour: " + str(api_calls) + "/360")
+                        print()
         elif choice == "4":
             menu = False
         else:
