@@ -13,6 +13,8 @@ id_list = []
 date_list = []
 api_key = "moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5"
 
+now_time = datetime.now()
+
 if os.path.isfile("api_calls.txt") == True:
     if os.path.getsize("api_calls.txt") != 0:
         file = open("api_calls.txt","r")
@@ -25,15 +27,22 @@ if os.path.isfile("api_calls.txt") == True:
         file = open("api_calls","r")
         api_calls = file.readline()
 
-if os.path.isfile("close_time.txt") == True:
-    file = open("close_time.txt","r")
-    close_time = file.readline()
-    close_time = datetime.strptime(close_time, '%Y-%m-%d %H:%M:%S.%f')
-    launch_time = datetime.now()
-    difference = launch_time - close_time
+if os.path.isfile("launch_time.txt") == True:
+    file = open("launch_time.txt","r")
+    launch_time = file.readline()
+    launch_time = datetime.strptime(launch_time, '%Y-%m-%d %H:%M:%S.%f')
+    difference = now_time - launch_time
     threshold = timedelta(hours = 1)
     if difference >= threshold:
         api_calls = 0
+        file.close()
+        file = open("launch_time.txt","w")
+        file.write(str(now_time))
+        file.close()
+else:
+    file = open("launch_time.txt","w")
+    file.write(str(now_time))
+    file.close()
 
 ##########
 
@@ -195,11 +204,6 @@ menu()
 
 file = open("api_calls.txt","w")
 file.write(str(api_calls))
-file.close()
-
-close_time = datetime.now()
-file = open("close_time.txt","w")
-file.write(str(close_time))
 file.close()
 
 ## good human to computer interaction
