@@ -4,51 +4,64 @@ import re
 import os
 from datetime import datetime, timedelta
 
-#make launch time only not close time, only create datetime when needed
-#make countdown delete lines and menu actions too
-#add settings (first or last release, limit) + first time launch sequence (user must give valid api_key) + change save file system (1 file for all save information)
+#add settings (first or last release, limit, lowest valid date ) + first time launch sequence (user must give valid api_key) + change save file system (1 file for all save information)
+
+#0 = api_key
+#1 = datetime
+#2 = api_calls
+#3 = min_date
+#4 = limit
+#5 = True =  Latest Release Date; False(default) = First Release Date
 
 id_list = []
 date_list = []
-api_key = "moby_YXyzhJMmxrbwCTmUy5TfnLUfQu5"
 
 now_time = datetime.now()
 
-if os.path.isfile("api_calls.txt") == True:
-    if os.path.getsize("api_calls.txt") != 0:
-        file = open("api_calls.txt","r")
-        api_calls = file.readline()
-        api_calls = int(api_calls)
-    else:
-        file = open("api_calls.txt","w")
-        file.write("0")
-        file.close()
-        file = open("api_calls","r")
-        api_calls = file.readline()
-
-if os.path.isfile("launch_time.txt") == True:
-    file = open("launch_time.txt","r")
-    launch_time = file.readline()
+if os.path.isfile("save.txt") == True:
+    file = open("save.txt","r")
+    lines = file.read().splitlines()
+    api_key = lines[0]
+    launch_time = lines[1]
     launch_time = datetime.strptime(launch_time, '%Y-%m-%d %H:%M:%S.%f')
     difference = now_time - launch_time
     threshold = timedelta(hours = 1)
     if difference >= threshold:
         api_calls = 0
-        file.close()
-        file = open("launch_time.txt","w")
-        file.write(str(now_time))
-        file.close()
+        launch_time = now_time
+    else:
+        api_calls = lines[2]
+        api_calls = int(api_calls)
+    min_date = lines[3]
+    min_date = int(min_date)
+    limit = lines[4]
+    limit = int(limit)
+    last_release = lines[5]
+    last_release = bool(last_release)
 else:
-    file = open("launch_time.txt","w")
-    file.write(str(now_time))
+    key = input("Please enter a valid MobyGames.com API Key: ")
+    print("Welcome!")
+    file = open("save.txt","w")
+    file.write(str(key)+"\n")
+    file.write(str(now_time)+"\n")
+    file.write("0\n")
+    file.write("1948\n")
+    file.write("100\n")
+    file.write("False\n")
     file.close()
+    api_key = key
+    api_calls = 0
+    launch_time = now_time
+    min_date = 1948
+    limit = 100
+    last_release = False
 
 ##########
 
 def get_id(title):
     url = "https://api.mobygames.com/v1/games"
     words = title.split()
-    if words[0] == "the":
+    if words[0] == "the" or words[0] == "The":
         title = title[4:]
     params = {"api_key":api_key,"title":title,"format":"id"}
 
@@ -120,54 +133,90 @@ def create_id_list(titles, name):
 def create_date_list(ids, name):
     game_current = 0
     game_count = len(ids)
+    id_count = 0
     for line in ids:
-        game_current += 1
         list = line.strip('][').split(', ')
-        date_list = []
-        print("Game " + str(game_current) + "/" + str(game_count))
         for id in list:
-            date = extract_date(get_date(id))
-            for d in date:
-                d = int(d)
-                if d >= 1980:
-                    date_list.append(d)
-        final_date = min(date_list)
-        make_date_list(final_date)
-    
-    write_date_list(name)
+            id_count += 1
+    check = take_user_input("There are " + str(id_count) + " IDs, meaning this will take " + str(id_count) + " API calls to complete. Do you wish to continue? (y/n): ")
+    if check == "y":
+        for line in ids:
+            game_current += 1
+            list = line.strip('][').split(', ')
+            date_list = []
+            print("Game " + str(game_current) + "/" + str(game_count))
+            for id in list:
+                date = extract_date(get_date(id))
+                for d in date:
+                    d = int(d)
+                    if d >= min_date:
+                        date_list.append(d)
+            if last_release == False:
+                final_date = min(date_list)
+            else:
+                final_date = max(date_list)
+            make_date_list(final_date)
+        
+        write_date_list(name)
+        print()
+        print("Done. Saved to " + name)
+        print()
 
-def remove_menu():
-    delete = 6
+def save():
+    file = open("save.txt","w")
+    file.write(api_key + '\n')
+    file.write(str(launch_time) + '\n')
+    file.write(str(api_calls) + '\n')
+    file.write(str(min_date) + '\n')
+    file.write(str(limit) + '\n')
+    file.write(str(last_release) + '\n')
+
+def remove_menu(lines):
+    delete = lines
     while delete > 0:
         print ("\033[A                                                                           \033[A")
         delete -= 1
 
+def take_user_input(message):
+    repeat = True
+    while repeat == True:
+        string = input(message)
+        if string:
+            return string.strip()
+        else:
+            print("Invalid Input!")
+
 def menu():
+    global api_key
+    global min_date
+    global limit
+    global last_release
     menu = True
     while menu == True:
         print("Would you like to:")
         print("1. Load List of Game Titles and Create ID List")
         print("2. Load ID List and Create Date List")
         print("3. Enter Game Title Manually and Get First Release Date")
-        print("4. Exit Program")
-        choice = input()
+        print("4. Settings")
+        print("5. Exit Program")
+        choice = take_user_input("")
         if choice == "1":
-            remove_menu()
-            name = input("Enter the name of the titles text file: ")
-            id_name = input("Name the output file (remember to include .txt): ")
+            remove_menu(7)
+            name = take_user_input("Enter the name of the titles text file: ")
+            id_name = take_user_input("Name the output file (remember to include .txt): ")
             with open(name) as x:
                 titles = x.read().splitlines()
             create_id_list(titles, id_name)
         elif choice == "2":
-            remove_menu()
-            name = input("Enter the name of the ID List text file: ")
-            date_name = input("Name the output file (remember to include .txt): ")
+            remove_menu(7)
+            name = take_user_input("Enter the name of the ID List text file: ")
+            date_name = take_user_input("Name the output file (remember to include .txt): ")
             with open(name) as y:
                 ids = y.read().splitlines()
             create_date_list(ids, date_name)
         elif choice == "3":
-            remove_menu()
-            game_title = input("Enter the title of the game (not case sensitive): ")
+            remove_menu(7)
+            game_title = take_user_input("Enter the title of the game (not case sensitive): ")
             print("Searching...")
             id_list = extract_id(get_id(game_title))
             total_time = len(id_list)
@@ -175,9 +224,9 @@ def menu():
                 print("Game not found!")
             else:
                 if total_time == 100:
-                    choice = input("There are " + str(total_time) + " (limit 100) Game IDs matching " + str(game_title) + ". Would you like to continue? (y/n): ")
+                    choice = take_user_input("There are " + str(total_time) + " (limit 100) Game IDs matching " + str(game_title) + ". Would you like to continue? (y/n): ")
                 else:
-                    choice = input("There are " + str(total_time) + " Game IDs matching " + str(game_title) + ". Would you like to continue? (y/n): ")
+                    choice = take_user_input("There are " + str(total_time) + " Game IDs matching " + str(game_title) + ". Would you like to continue? (y/n): ")
                 if choice == "y":
                     print ("\033[A                                                                                                                        \033[A")
                     print("Game IDs Remaining: " + str(total_time))
@@ -190,25 +239,68 @@ def menu():
                             print("Game IDs Remaining: " + str(total_time))
                             for d in date:
                                 d = int(d)
-                                if d >= 1980:
+                                if d >= min_date:
                                     date_list.append(d)
-                        final_date = min(date_list)
-                        print ("\033[A                             \033[A")
-                        print()
-                        print(game_title + " was first released in " + str(final_date))
+                        if last_release == False:
+                            final_date = min(date_list)
+                            print ("\033[A                             \033[A")
+                            print()
+                            print(game_title + " was first released in " + str(final_date))
+                        else:
+                            final_date = max(date_list)
+                            print ("\033[A                             \033[A")
+                            print()
+                            print(game_title + " was last released in " + str(final_date))
                         print()
                         print("API Calls Made Within Hour: " + str(api_calls) + "/360")
                         print()
         elif choice == "4":
+            remove_menu(7)
+            file = open("save.txt","r")
+            lines = file.read().splitlines()
+            print("1. api_key = " + str(lines[0]))
+            print("2. Minimum Date = " + str(lines[3]))
+            print("3. Limit = " + str(lines[4]))
+            print("4. Latest Release Date = " + str(lines[5]))
+            print("5. Go Back to Menu")
+            choice = take_user_input("")
+            if choice == "1":
+                remove_menu(6)
+                key = take_user_input("Enter new api key: ")
+                api_key = key
+                save()
+            elif choice == "2":
+                remove_menu(6)
+                date = take_user_input("Enter new minimum year: ")
+                min_date = int(date)
+                save()
+            elif choice == "3":
+                remove_menu(6)
+                new_limit = take_user_input("Enter new limit (max 100): ")
+                new_limit = int(new_limit)
+                if new_limit > 100:
+                    new_limit = 100
+                limit = new_limit
+                save()
+            elif choice == "4":
+                remove_menu(6)
+                release = take_user_input("Would you like to search for latest release instead of first release? (y/n): ")
+                if release == "y":
+                    last_release = True
+                    save()
+                elif release == "n":
+                    last_release = False
+                    save()
+            elif choice == "5":
+                remove_menu(6)
+
+        elif choice == "5":
             menu = False
         else:
-            print("Invalid Input!")         
+            print("Invalid Input!")
+        save()     
         
 menu()
-
-file = open("api_calls.txt","w")
-file.write(str(api_calls))
-file.close()
 
 ## good human to computer interaction
 
