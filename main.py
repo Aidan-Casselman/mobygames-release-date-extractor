@@ -4,14 +4,16 @@ import re
 import os
 from datetime import datetime, timedelta
 
-#add settings (first or last release, limit, lowest valid date ) + first time launch sequence (user must give valid api_key) + change save file system (1 file for all save information)
+# MobyGames Release Date Extractor
+# Version 1.0
 
-#0 = api_key
-#1 = datetime
-#2 = api_calls
-#3 = min_date
-#4 = limit
-#5 = True =  Latest Release Date; False(default) = First Release Date
+# save.txt explanation:
+# 0 = api_key
+# 1 = datetime
+# 2 = api_calls
+# 3 = min_date
+# 4 = limit
+# 5 = True = Latest Release Date; False(default) = First Release Date
 
 id_list = []
 date_list = []
@@ -301,9 +303,3 @@ def menu():
         save()     
         
 menu()
-
-## good human to computer interaction
-
-## 360 api call limit
-
-## robust exception handling
