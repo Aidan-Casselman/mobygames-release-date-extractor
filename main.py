@@ -58,6 +58,8 @@ else:
     limit = 100
     last_release = False
 
+max_date = 2023
+
 ##########
 
 def get_id(title):
@@ -154,7 +156,7 @@ def create_date_list(ids, name):
                         date = extract_date(get_date(id))
                         for d in date:
                             d = int(d)
-                            if d >= min_date:
+                            if (d >= min_date) & (d <= max_date):
                                 date_list.append(d)
                     else:
                         pause()
@@ -259,7 +261,7 @@ def menu():
                             print("Game IDs Remaining: " + str(total_time))
                             for d in date:
                                 d = int(d)
-                                if d >= min_date:
+                                if (d >= min_date) & (d <= max_date):
                                     date_list.append(d)
                         if last_release == False:
                             final_date = min(date_list)
