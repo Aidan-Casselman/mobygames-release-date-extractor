@@ -77,6 +77,8 @@ def get_id(title):
     if response.status_code == 200:
         data = response.json()
         return(data)
+    elif response.status_code == 429:
+        pause()
     else:
         print("Error Code: " + str(response.status_code))
 
@@ -89,6 +91,8 @@ def get_date(id):
     api_calls += 1
     if response.status_code == 200:
         return response.json()
+    elif response.status_code == 429:
+        pause()
     else:
         print("Error Code: " + str(response.status_code))
 
@@ -185,7 +189,7 @@ def save():
 def remove_menu(lines):
     delete = lines
     while delete > 0:
-        print ("\033[A                                                                           \033[A")
+        print ("\033[A                                                                                                                                       \033[A")
         delete -= 1
 
 def take_user_input(message):
@@ -198,13 +202,19 @@ def take_user_input(message):
             print("Invalid Input!")
 
 def pause():
-    print("Taking one hour break to get 360 more API calls...")
     seconds = 3601
     while seconds > 0:
-        time.sleep(1)
         seconds -= 1
-        remove_menu(1)
-        print("Time remaining: " + str(seconds))
+        remove_menu(2)
+        secs = seconds % (24 * 3600)
+        hour = seconds // 3600
+        secs0 = secs
+        secs0 %= 3600
+        minutes = seconds // 60
+        secs1 = secs0
+        secs1 %= 60
+        print("Waiting for 360 more API calls.\nTime Remaining: " + "%d:%02d:%02d" % (hour, minutes, secs1))
+        time.sleep(1)
     global api_calls
     api_calls = 0
 
