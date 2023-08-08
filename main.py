@@ -137,26 +137,33 @@ def create_date_list(ids, name):
     game_count = len(ids)
     id_count = 0
     for line in ids:
-        list = line.strip('][').split(', ')
-        for id in list:
-            id_count += 1
-    check = take_user_input("There are " + str(id_count) + " IDs, meaning this will take " + str(id_count) + " API calls to complete. Do you wish to continue? (y/n): ")
+        if line != "[]":
+            list = line.strip('][').split(', ')
+            for id in list:
+                id_count += 1
+    check = take_user_input("There are " + str(id_count) + " IDs, meaning this will take " + str(id_count) + " API calls and approximately " + str(round( id_count/360, 2)) + " hours to complete. Do you wish to continue? (y/n): ")
     if check == "y":
         for line in ids:
             game_current += 1
-            list = line.strip('][').split(', ')
-            date_list = []
             print("Game " + str(game_current) + "/" + str(game_count))
-            for id in list:
-                date = extract_date(get_date(id))
-                for d in date:
-                    d = int(d)
-                    if d >= min_date:
-                        date_list.append(d)
-            if last_release == False:
-                final_date = min(date_list)
+            if line != "[]":
+                list = line.strip('][').split(', ')
+                date_list = []
+                for id in list:
+                    if api_calls < 360:
+                        date = extract_date(get_date(id))
+                        for d in date:
+                            d = int(d)
+                            if d >= min_date:
+                                date_list.append(d)
+                    else:
+                        pause()
+                if last_release == False:
+                    final_date = min(date_list)
+                else:
+                    final_date = max(date_list)
             else:
-                final_date = max(date_list)
+                final_date = ""
             make_date_list(final_date)
         
         write_date_list(name)
@@ -187,6 +194,17 @@ def take_user_input(message):
             return string.strip()
         else:
             print("Invalid Input!")
+
+def pause():
+    print("Taking one hour break to get 360 more API calls...")
+    seconds = 3601
+    while seconds > 0:
+        time.sleep(1)
+        seconds -= 1
+        remove_menu(1)
+        print("Time remaining: " + str(seconds))
+    global api_calls
+    api_calls = 0
 
 def menu():
     global api_key
