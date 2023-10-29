@@ -241,7 +241,7 @@ def save():
 def remove_menu(lines):
     delete = lines
     while delete > 0:
-        print ("\033[A                                                                           \033[A")
+        print ("\033[A                                                                                                                                       \033[A")
         delete -= 1
 
 # takes user input as a string
