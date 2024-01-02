@@ -14,7 +14,7 @@
 
 ## [1.0] - 2023-10-29
 ### Added
-- First release of MobyGames Release Date Extractor
+- 1.0 Update of MobyGames Release Date Extractor
 - More settings i.e., exact query match, year only
 - Ability to specify platform in csv file
 - Ability to accept single column csv files
@@ -27,3 +27,10 @@
 
 ### Removed
 - Unused settings and functions
+
+## [1.0 Release] - 2024-01-02
+### Added
+- 1.0 Release of MobyGames Release Date Extractor
+
+### Changed
+- Refined Git commit history to unify authorship
