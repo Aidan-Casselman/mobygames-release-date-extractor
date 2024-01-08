@@ -14,7 +14,6 @@
 
 ## [1.0] - 2023-10-29
 ### Added
-- 1.0 Update of MobyGames Release Date Extractor
 - More settings i.e., exact query match, year only
 - Ability to specify platform in csv file
 - Ability to accept single column csv files
@@ -34,3 +33,8 @@
 
 ### Changed
 - Refined Git commit history to unify authorship
+
+## [1.1] - 2024-01-08
+### Fixed
+- Fixed 'year_only' bug truncating YYYY-MM dates to first character
+- Fixed progress display bug unnecessarily creating new lines in terminal

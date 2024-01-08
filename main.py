@@ -101,8 +101,10 @@ def extract_dates(game):
     for platform in game.get('platforms', []):
         platform_name = platform.get('platform_name')
         release_date = platform.get('first_release_date')
-        if (year_only == True) & (len(release_date) > 4):
+        if (year_only == True) & (len(release_date) > 7):
             release_date = release_date[:-6]
+        elif (year_only == True) & (len(release_date) > 4):
+            release_date = release_date[:-3]
         if platform_name and release_date:
             release_dates[platform_name] = release_date
     return ({'title': title, 'release_dates': release_dates})
@@ -198,7 +200,7 @@ def create_date_list(csv_filename, filename):
                 for row in reader:
                     if api_calls < 360:
                         game_current += 1
-                        remove_menu(1)
+                        print ("\033[A             \033[A")
                         print("Game " + str(game_current) + "/" + str(game_count))
                         name = row[0]
                         data = extract_game_info(get_data(name), name)
@@ -207,7 +209,7 @@ def create_date_list(csv_filename, filename):
                 for row in reader:
                     if api_calls < 360:
                         game_current += 1
-                        remove_menu(1)
+                        print ("\033[A             \033[A")
                         print("Game " + str(game_current) + "/" + str(game_count))
                         name, platform = row
                         data = extract_game_info(get_data(name), name)
